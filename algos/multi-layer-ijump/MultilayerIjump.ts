@@ -490,12 +490,17 @@ export class MultilayerIjump extends GeneralizedAstarAutorouter {
           }
         }
         if (travelDir.wallDistance === Infinity) {
-          travelDirs3.push({
-            ...travelDir,
-            travelDistance: goalDistAlongTravelDir,
-            enterMarginCost: 0,
-            travelMarginCostFactor: 1,
-          })
+          // Only travel toward the goal when the goal is actually in this
+          // direction and the distance is positive. Otherwise this branch
+          // can create a backwards/wild trace jump from a negative distance.
+          if (isGoalInTravelDir && goalDistAlongTravelDir > 0) {
+            travelDirs3.push({
+              ...travelDir,
+              travelDistance: goalDistAlongTravelDir,
+              enterMarginCost: 0,
+              travelMarginCostFactor: 1,
+            })
+          }
         } else if (travelDir.wallDistance > this.largestMargin) {
           for (const { margin, enterCost, travelCostFactor } of this
             .marginsWithCosts) {
